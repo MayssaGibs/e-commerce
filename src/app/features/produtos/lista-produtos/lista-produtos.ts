@@ -5,6 +5,7 @@ import { computed } from '@angular/core';
 import { PrecoFormatadoPipe } from '../../../shared/pipes/preco-formatado-pipe';
 import { effect } from '@angular/core';
 import { UpperCasePipe } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-lista-produtos',
@@ -13,14 +14,11 @@ import { UpperCasePipe } from '@angular/common';
   styleUrl: './lista-produtos.css',
 })
 export class ListaProdutos {
-  //!Lista com dados = Array
-  produtos = signal([
-    {nome: 'Teclado Gamer', preco:329.99},
-    {nome: 'Mouse Gamer',   preco:129.99},
-    {nome: 'Monitor Gamer', preco:1229.99},
-    {nome: 'Headset Gamer', preco:229.99},
-    {nome: 'Gabinete Gamer', preco:359.99}
-  ]);
+  //!Lista com dados = Array  ============ SIGNALS =======================
+  produtos = signal <{nome: string, preco: number}[]>([]);
+
+  carregando = signal (true);
+
   //!Função para exibir produtos selecionados pelo usuario no console 
   exibirProduto(nome: string){
     console.log('Produto Selecionado: ', nome);
@@ -32,10 +30,9 @@ export class ListaProdutos {
       ...listaAtual,
       {nome:'Playstation 5', preco:3000},
     ]);
-  }
-  //!Função que contabiliza a quantidade de produtos na lista com metodo computed()
+  } 
   totalProdutos = computed(() => this.produtos().length);
-  //!Função que calcula o valor total dos produtos usando o metodo computed()
+  //!Função que calcula o valor total dos produtos usando o metodo computed() =====  COMPUTED ========
   valorTotal = computed(() =>
   {return this.produtos().reduce((total, item) =>
   total + item.preco,0)});
@@ -49,8 +46,32 @@ export class ListaProdutos {
       { nome: 'Headset', preco: 30 },
     ]);
   }
-  //!Metodo para monitorar alterações em tempo real usnado o effect()
-  constructor(){
+     carregarProdutos(){
+      this.carregando.set(true);
+      this.http.get<{title: string; price: number}[]>
+      ('https://fakestoreapi.com/products').subscribe({
+        next:(dados) => {
+          const produtosFormatados = dados.map(p =>({
+            nome: p.title,
+            preco: p.price,
+          }));
+          this.produtos.set(produtosFormatados);
+          this.carregando.set(false);
+        },
+        error: (erro) => {
+          console.error('Erro ao carregar produtos: ', erro);
+          this.carregando.set(false);
+        }
+      });
+
+     }
+
+  //!Metodo para monitorar alterações em tempo real usnado o effect() //! Carrega a API
+  constructor(private http: HttpClient){
+    this.carregarProdutos();
+    
+
+    //! effects contiunuam iguais - não mexer
     effect(() =>{
       console.log('Lista de Produtos Alterados: ', this.produtos());
     });
@@ -63,15 +84,15 @@ export class ListaProdutos {
       }
     });
   }
-  //!Metodo para criar um estado de seleção com signal string | null
+  //!Metodo para criar um estado de seleção com signal string | null =====  SIGNAL ========
   produtoSelecionado = signal <string | null>(null);
-  //!Metodo para criar um estado para carrinho com o signal
+  //!Metodo para criar um estado para carrinho com o signal =====  SIGNAL ========
   carrinho = signal <{nome: string; preco: number}[]>([]);
   adicionarAoCarrinho(produto:{nome: string; preco: number}){
     this.carrinho.update(listaAtual => [...listaAtual, produto]
 );
   }
-  //! totalProdutos = computed(()=> this.produtos().Length);
+  //! totalProdutos = computed(()=> this.produtos().Length); ========= COMPUTED=========
   //Metodo para calcular a quantidade total de itens no carrinho
   quantidadeCarrinho = computed(() => this.carrinho().length);
   //Metodo para caclular o valor total dos itens do carrinho
