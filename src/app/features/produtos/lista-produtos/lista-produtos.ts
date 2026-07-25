@@ -6,6 +6,8 @@ import { PrecoFormatadoPipe } from '../../../shared/pipes/preco-formatado-pipe';
 import { effect } from '@angular/core';
 import { UpperCasePipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { produtosService } from '../produtos.service';
+import { inject } from '@angular/core';
 
 @Component({
   selector: 'app-lista-produtos',
@@ -24,6 +26,8 @@ export class ListaProdutos {
     console.log('Produto Selecionado: ', nome);
     this.produtoSelecionado.set(nome);
   }
+       private produtosService = inject(produtosService);
+
   //!Função que adiciona produto usando metodo update()
   adicionarProduto(){
     this.produtos.update(listaAtual => [
@@ -47,15 +51,12 @@ export class ListaProdutos {
     ]);
   }
      carregarProdutos(){
+
       this.carregando.set(true);
-      this.http.get<{title: string; price: number}[]>
-      ('https://fakestoreapi.com/products').subscribe({
-        next:(dados) => {
-          const produtosFormatados = dados.map(p =>({
-            nome: p.title,
-            preco: p.price,
-          }));
-          this.produtos.set(produtosFormatados);
+      this.produtosService.buscarProdutos().subscribe({
+        next: (dados) => {
+          const produtos = this.produtosService.transformarProdutos(dados);
+          this.produtos.set(produtos);
           this.carregando.set(false);
         },
         error: (erro) => {
@@ -67,7 +68,7 @@ export class ListaProdutos {
      }
 
   //!Metodo para monitorar alterações em tempo real usnado o effect() //! Carrega a API
-  constructor(private http: HttpClient){
+  constructor(){
     this.carregarProdutos();
     
 
@@ -102,4 +103,5 @@ export class ListaProdutos {
   //! valorTotal = computed(() => {
   //! return this.produtos().reduce((total, item) =>
   //! total + item.preco,0)});
+
 }
