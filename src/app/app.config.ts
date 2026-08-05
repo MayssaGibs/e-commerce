@@ -4,12 +4,15 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { provideClientHydration } from '@angular/platform-browser';
 import { provideHttpClient, withFetch } from '@angular/common/http';
+import { withInterceptors } from '@angular/common/http';
+import { httpInterceptor } from './core/interceptors/http.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes), 
-    provideClientHydration(),
-    provideHttpClient(withFetch()),
-  ]
+     provideClientHydration(),
+    provideHttpClient(withFetch(),
+   withInterceptors([httpInterceptor])),
+  ],
 };
