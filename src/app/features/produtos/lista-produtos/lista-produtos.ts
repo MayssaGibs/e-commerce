@@ -6,8 +6,9 @@ import { PrecoFormatadoPipe } from '../../../shared/pipes/preco-formatado-pipe';
 import { effect } from '@angular/core';
 import { UpperCasePipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { produtosService } from '../produtos.service';
+import { produtosService } from '../../../core/services/produtos.service';
 import { inject } from '@angular/core';
+import { CarrinhoService } from '../../../core/services/carrinho.service';
 
 @Component({
   selector: 'app-lista-produtos',
@@ -28,7 +29,14 @@ export class ListaProdutos {
     console.log('Produto Selecionado: ', nome);
     this.produtoSelecionado.set(nome);
   }
+
+  //! ================= IJECT ===============
        private produtosService = inject(produtosService);
+       public carrinhoService = inject(CarrinhoService);
+
+       quantidadeCarrinho = this.carrinhoService.quantidadeItens;
+       totalCarrinho = this.carrinhoService.totalItens;
+
 
   //!Função que adiciona produto usando metodo update()
   adicionarProduto(){
@@ -91,20 +99,10 @@ export class ListaProdutos {
   //!Metodo para criar um estado de seleção com signal string | null =====  SIGNAL ========
   produtoSelecionado = signal <string | null>(null);
   //!Metodo para criar um estado para carrinho com o signal =====  SIGNAL ========
-  carrinho = signal <{nome: string; preco: number}[]>([]);
+  
   adicionarAoCarrinho(produto:{nome: string; preco: number}){
-    this.carrinho.update(listaAtual => [...listaAtual, produto]
-);
+     this.carrinhoService.adicionar(produto);  
   }
-  //! totalProdutos = computed(()=> this.produtos().Length); ========= COMPUTED=========
-  //Metodo para calcular a quantidade total de itens no carrinho
-  quantidadeCarrinho = computed(() => this.carrinho().length);
-  //Metodo para caclular o valor total dos itens do carrinho
-  totalCarrinho = computed(() => {
-    return this.carrinho().reduce((total, item)=>
-      total + item.preco, 0)});
-  //! valorTotal = computed(() => {
-  //! return this.produtos().reduce((total, item) =>
-  //! total + item.preco,0)});
+  
 
 }
