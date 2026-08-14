@@ -1,8 +1,10 @@
 import { Injectable, signal, computed } from "@angular/core";
 
-type Usuario={
+type PerfilUsuario = 'usuario' | 'admin';
+
+type Usuario = {
     email: string;
-    perfil: string;
+    perfil: PerfilUsuario;
 }
 @Injectable({
     providedIn: 'root'
@@ -16,7 +18,25 @@ usuarioAtual = computed(()=> this.usuario());
 usuarioLogado = computed(()=> this.usuario() ! == null);
 token = computed(()=> this.tokenJwT());
 
-login(){}
+login(email: string, senha: string): boolean {
+
+    if(!email || !senha){
+        return false;
+    }
+const tokenSimulado = 
+'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.' +
+'eyJzdWIiOiJhbHVub0B0ZXN0ZS5jb20iLCJwZXJmaWwiOiJ1c3VhcmlvIn0.' 
++'assinatura-simulada';
+
+this.usuario.set({
+    email,
+    perfil: 'usuario',
+});
+
+this.tokenJwT.set(tokenSimulado);
+return true;
+
+}
 
 logout() {
     this.usuario.set(null);
