@@ -13,7 +13,7 @@ import { AuthService } from '../../../core/services/auth.service';
   styleUrl: './header.css',
 })
 export class Header {
-  nomeLoja = 'Mercado das Tecs';
+  nomeLoja = 'Mercadão';
   private carrinhoService = inject(CarrinhoService);
   quantidadeHeader = this.carrinhoService.quantidadeItens;
 
