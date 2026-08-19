@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
-import { AuthService } from '../../../core/services/auth.service';
+import { AuthFacade } from '../../../core/facades/auth.facade';
 import { inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 
@@ -13,11 +13,11 @@ import { MatButtonModule } from '@angular/material/button';
 export class AcessoNegado {
 
   private router = inject(Router);
-  private authService =inject(AuthService);
+  private authFacade =inject(AuthFacade);
 
   sair(){
 
-    this.authService.logout();
+    this.authFacade.sair();
     this.router.navigateByUrl('/login');
     return;
   }
