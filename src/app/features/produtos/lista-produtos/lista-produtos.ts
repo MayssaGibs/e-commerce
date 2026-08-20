@@ -8,7 +8,8 @@ import { UpperCasePipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { produtosService } from '../../../core/services/produtos.service';
 import { inject } from '@angular/core';
-import { CarrinhoService } from '../../../core/services/carrinho.service';
+import { CarrinhoFacade } from '../../../core/facades/carrinho.facade';
+import { ItemCarrinho } from '../../../core/models/item-carrinho';
 
 @Component({
   selector: 'app-lista-produtos',
@@ -32,10 +33,10 @@ export class ListaProdutos {
 
   //! ================= IJECT ===============
        private produtosService = inject(produtosService);
-       public carrinhoService = inject(CarrinhoService);
+       public carrinhoFacade = inject(CarrinhoFacade);
 
-       quantidadeCarrinho = this.carrinhoService.quantidadeItens;
-       totalCarrinho = this.carrinhoService.totalItens;
+       quantidadeCarrinho = this.carrinhoFacade.quantidadeCarrinho;
+       totalCarrinho = this.carrinhoFacade.totalCarrinho;
 
 
   //!Função que adiciona produto usando metodo update()
@@ -100,8 +101,8 @@ export class ListaProdutos {
   produtoSelecionado = signal <string | null>(null);
   //!Metodo para criar um estado para carrinho com o signal =====  SIGNAL ========
   
-  adicionarAoCarrinho(produto:{nome: string; preco: number}){
-     this.carrinhoService.adicionar(produto);  
+  adicionarAoCarrinho(produto: ItemCarrinho){
+     this.carrinhoFacade.adicionarProdutoCarrinho(produto);  
   }
   
 
