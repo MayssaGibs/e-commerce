@@ -3,7 +3,6 @@ import { CarrinhoService } from "../services/carrinho.service";
 import { ItemCarrinho } from "../models/item-carrinho";
 
 
-
 @Injectable({providedIn: 'root'})
 
 export class CarrinhoFacade {
@@ -25,7 +24,6 @@ export class CarrinhoFacade {
    removerItem(rmvItem: number){
     this.carrinhoService.removerItem(rmvItem);
    }
-
 
 
 }
